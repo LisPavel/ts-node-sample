@@ -3,11 +3,10 @@ interface Post {
   title: string;
   body: string;
 }
-interface PostsById {
-  [id: string]: Post;
-}
-interface NormalizedData {
-  byId: PostsById;
+interface NormalizedData<T extends { id: string }> {
+  byId: {
+    [id: string]: T | undefined;
+  };
   allIds: string[];
 }
 
@@ -49,14 +48,16 @@ const posts: Post[] = [
   },
 ];
 
-const normalizeData = (unnormalizedData: Post[]): NormalizedData => {
+const normalizeData = <T extends { id: string }>(
+  unnormalizedData: T[]
+): NormalizedData<T> => {
   const data = unnormalizedData.reduce(
     (acc, post) => {
       acc.byId[post.id] = post;
       acc.allIds.push(post.id);
       return acc;
     },
-    { byId: {}, allIds: [] } as NormalizedData
+    { byId: {}, allIds: [] } as NormalizedData<T>
   );
   return data;
 };
